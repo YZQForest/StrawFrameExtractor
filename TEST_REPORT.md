@@ -42,3 +42,12 @@ Windows 准备 ffmpeg/ffmpeg.exe 与 ffmpeg/ffprobe.exe 后：
 - 权限拒绝、真实磁盘写满、断电和损坏媒体的全部组合未进行系统级故障注入。
 - 图片格式和方向已验证；未实际启动 AnyLabeling / SAM。
 - PyInstaller 配置已提供，未在本机执行跨系统打包；不能将源码测试成功当作 Windows exe 已验证。
+
+
+## 2026-10-15 人工像素标注 v2
+
+- Python 标准库包校验与本机保存测试：9/9通过，包括覆盖率区间、训练映射、草稿隔离、完成门、SHA损坏、路径越界、独立导出不覆盖及本机令牌。
+- Chrome 实际浏览器端到端流程：11项通过，未产生 JavaScript pageerror。覆盖目录载入、画笔/矩形/多边形、撤销重做、材料争议与ROI分离、未标完成门、真正PNG导出独立解码、原图字节不变、服务端校验、刷新恢复、ZIP恢复与空白独立复标。
+- 测试只用合成图片，测试输出与科研人工标签分开。标注者声明完成不等于人工正确性认证。
+- Mac副本与仓库HTML/服务/校验模块逐文件SHA一致；Python语法与git diff空白检查通过。
+- Windows GUI增加标注入口，PyInstaller包含HTML；本次未在Windows运行或生成exe。原抽帧功能没有改动。
