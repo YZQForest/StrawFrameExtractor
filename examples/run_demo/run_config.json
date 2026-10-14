@@ -1,0 +1,40 @@
+{
+  "software_version": "1.0.0",
+  "run_id": "f748621aa5c643fe9060afc940233ace",
+  "created_at": "2026-10-03T04:45:07.334735+08:00",
+  "settings": {
+    "mode": "fps",
+    "value": "2",
+    "image_format": "jpg",
+    "jpeg_quality": 2,
+    "scale_mode": "original",
+    "width": 1920,
+    "height": 1080
+  },
+  "extract_fps": "2",
+  "keep_original_resolution": true,
+  "ffmpeg_path": "/Users/yzq/Documents/Codex/2026-10-03/files-mentioned-by-the-user-1/work/ffmpeg/ffmpeg",
+  "ffprobe_path": "/Users/yzq/Documents/Codex/2026-10-03/files-mentioned-by-the-user-1/work/ffmpeg/ffprobe",
+  "ffmpeg_version": "ffmpeg version 9.0.2-https://www.martin-riedl.de Copyright (c) 2000-2026 the FFmpeg developers",
+  "inputs": [
+    {
+      "video_id": "V01_ef69ad1f3273",
+      "video": {
+        "path": "/Users/yzq/Documents/Codex/2026-10-03/files-mentioned-by-the-user-1/outputs/StrawFrameExtractor/examples/inputs/中文 样例.mp4",
+        "duration": 2.002,
+        "width": 640,
+        "height": 360,
+        "fps_ratio": "60000/1001",
+        "codec": "h264",
+        "size": 855184,
+        "frames": 120,
+        "rotation": 0,
+        "start_time": "0.000000",
+        "time_base": "1/60000"
+      },
+      "size": 855184,
+      "mtime_ns": 1790973907319115598
+    }
+  ],
+  "timestamp_definition": "timestamp_sec = (selected source PTS - first decoded source PTS) * source_time_base; first actual frame of each floor((t-start_t)*rate+1e-8) bucket; no duplicated frames; auto rotation enabled"
+}
