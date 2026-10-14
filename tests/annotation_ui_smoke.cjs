@@ -53,8 +53,9 @@ async function run() {
   check('identity lock and background initialization');
 
   async function rect(cls, x1, y1, x2, y2) {
+    if (!await page.locator(`[data-class="${cls}"]`).isVisible()) await page.locator('#more').click();
     await page.locator(`[data-class="${cls}"]`).click();
-    await page.locator('[data-tool="rect"]').click();
+    await page.keyboard.press('r');
     const box = await page.locator('#canvas').boundingBox();
     await page.mouse.move(box.x + x1 * box.width / width, box.y + y1 * box.height / height);
     await page.mouse.down();
@@ -83,7 +84,7 @@ async function run() {
   assert.equal(await page.evaluate(() => count(current).excluded_pixels), 96);
   check('material ambiguity separated from valid ground ROI');
   await rect('64', 90, 10, 100, 20);
-  for (const id of ['check-roi', 'check-image', 'check-human']) await page.locator('#' + id).check();
+  await page.locator('#check-complete').check();
   await page.locator('#complete').click();
   assert.equal(await page.evaluate(() => current.status), 'draft');
   assert.match(await page.locator('#toast').textContent(), /未标/);
@@ -96,8 +97,10 @@ async function run() {
   assert.equal(await page.evaluate(() => count(current).straw_pixels), afterBrush + 400);
   check('completion rejects unmarked pixels and polygon paints original pixels');
   const expected = await page.evaluate(() => count(current));
+  await page.locator('#more').click();
   await page.locator('#notes').fill('SYNTHETIC TEST ONLY — not human research labels');
-  for (const id of ['check-roi', 'check-image', 'check-human']) await page.locator('#' + id).check();
+  await page.locator('#close-more').click();
+  await page.locator('#check-complete').check();
   await page.locator('#complete').click();
   await page.waitForFunction(() => current.file_name.includes('synthetic_02'));
   const responsePromise = page.waitForResponse(response => response.url().endsWith('/api/export') && response.request().method() === 'POST');
@@ -110,6 +113,8 @@ async function run() {
   assert.deepEqual(record.statistics, expected);
   assert.equal(record.statistics.coverage_pp, null);
   assert.equal(record.annotator, 'UI_TEST_ONLY');
+  assert.equal(record.inspection_confirmation_method, 'combined_checklist');
+  assert.deepEqual(record.inspection, {ground_roi_checked:true,full_image_checked:true,human_annotation_confirmed:true});
   const maskBytes = fs.readFileSync(path.join(saved.folder, record.mask_path));
   assert.equal(maskBytes[24], 8); assert.equal(maskBytes[25], 0);
   const labels = PNG.sync.read(maskBytes), roi = PNG.sync.read(fs.readFileSync(path.join(saved.folder, record.valid_roi_path))), train = PNG.sync.read(fs.readFileSync(path.join(saved.folder, record.training_mask_path)));
@@ -129,6 +134,7 @@ async function run() {
   assert.equal(await page.evaluate(() => tasks.filter(t => t.status === 'completed').length), 1);
   check('refresh restores project and completion');
   const backupPromise = page.waitForResponse(response => response.url().endsWith('/api/export') && response.request().method() === 'POST');
+  await page.locator('#more').click();
   await page.locator('#backup').click();
   const backup = await (await backupPromise).json();
   assert.equal(backup.completed, 1); assert.equal(backup.drafts, 1);
@@ -141,6 +147,7 @@ async function run() {
   assert.equal(await page.evaluate(() => count(current).straw_pixels), expected.straw_pixels);
   check('research ZIP restores masks and identity without overwriting old session');
   await page.waitForFunction(() => document.getElementById('busy').style.display === 'none');
+  await page.locator('#more').click();
   await page.locator('#new-session').click();
   await page.locator('#new-name').fill('UI_SECOND_RATER_TEST_ONLY');
   await page.locator('#confirm-new').click();
@@ -150,12 +157,19 @@ async function run() {
   assert.equal(await page.evaluate(() => session.role), 'independent_repeat');
   check('independent repeat starts blank with separate identity/session');
   await page.waitForFunction(() => document.getElementById('busy').style.display === 'none');
+  await page.locator('#more').click();
   await page.locator('#sessions').selectOption(originalSession);
   await page.waitForFunction(id => session.id === id && current, originalSession);
   await page.locator('.task').first().click();
   await page.waitForFunction(() => current?.file_name.includes('synthetic_01'));
   assert.equal(await page.evaluate(() => count(current).straw_pixels), expected.straw_pixels);
   check('primary masks survive repeat and session switching');
+  if (process.env.ANNOTATION_LEGACY_PACKAGE) {
+    await page.locator('#package-input').setInputFiles(process.env.ANNOTATION_LEGACY_PACKAGE);
+    await page.waitForFunction(() => current?.tool_version === '2.0.0' && current.status === 'completed');
+    assert.equal(await page.locator('#check-complete').isChecked(), true);
+    check('v2.0 package and prior three checks restore in simplified interface');
+  }
   assert.deepEqual(errors, []);
   await page.screenshot({ path: path.join(output, 'synthetic_ui_test.png'), fullPage: true });
   const result = { status: 'passed', checks, browser_errors: errors, completed_bundle: saved.package, backup_bundle: backup.package, synthetic_only: true };

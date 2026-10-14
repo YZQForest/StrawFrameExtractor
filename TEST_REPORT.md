@@ -51,3 +51,8 @@ Windows 准备 ffmpeg/ffmpeg.exe 与 ffmpeg/ffprobe.exe 后：
 - 测试只用合成图片，测试输出与科研人工标签分开。标注者声明完成不等于人工正确性认证。
 - Mac副本与仓库HTML/服务/校验模块逐文件SHA一致；Python语法与git diff空白检查通过。
 - Windows GUI增加标注入口，PyInstaller包含HTML；本次未在Windows运行或生成exe。原抽帧功能没有改动。
+
+
+## 2026-10-15 简洁界面 v2.1
+
+主界面收为两栏，身份只填一次，完成检查一次勾选；复标、恢复、备注、统计和设置在更多。数据编码和研究包格式保留，完成记录分别保存三项检查声明及combined_checklist来源。9项Python测试、12项Chrome端到端检查通过，包括v2.0数据包兼容与既有三项检查恢复。实图768裁块预览没有页面脚本异常；测试输出均为隔离合成数据。

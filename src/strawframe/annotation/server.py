@@ -90,7 +90,7 @@ def create_server(images: Path | None = None, catalog: Path | None = None,
                 return
             route = urllib.parse.urlsplit(self.path).path
             if route in ("/", "/index.html"):
-                self.answer(200, page, "text/html; charset=utf-8")
+                self.answer(200, app.read_bytes(), "text/html; charset=utf-8")
             elif route == "/api/catalog":
                 self.answer(200, {"samples": tasks, "token": token, "output": str(output), "project_id": project_id})
             elif route.startswith("/api/images/"):
