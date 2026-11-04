@@ -6,15 +6,19 @@ from PySide6.QtWidgets import (QMainWindow,QWidget,QVBoxLayout,QHBoxLayout,QGrid
 from strawframe.core.ffmpeg_manager import FFmpegManager
 from strawframe.core.models import Settings
 from strawframe.core.extractor import Extractor
-from strawframe.annotation.server import launch as launch_annotation
+from strawframe.annotation_bridge import launch_annotation
 from .workers import ProbeWorker,ExtractWorker
 
 class MainWindow(QMainWindow):
     def __init__(self):
-        super().__init__(); self.setWindowTitle('秸秆科研视频抽帧工具 · StrawFrameExtractor 1.0'); self.resize(1120,850); self.setAcceptDrops(True)
-        self.prefs=QSettings('StrawFrameExtractor','StrawFrameExtractor'); self.videos=[]; self.prober=None; self.worker=None; self.last_output=''; self.busy=False; self.annotation_servers=[]
+        super().__init__(); self.setWindowTitle('秸秆科研视频抽帧工具 · StrawFrameStudio 1.1'); self.resize(1120,850); self.setAcceptDrops(True)
+        self.prefs=QSettings('StrawFrameStudio','StrawFrameStudio');
+        legacy=QSettings('StrawFrameExtractor','StrawFrameExtractor')
+        for key in legacy.allKeys():
+            if not self.prefs.contains(key): self.prefs.setValue(key,legacy.value(key))
+        self.videos=[]; self.prober=None; self.worker=None; self.last_output=''; self.busy=False
         main=QWidget(); self.setCentralWidget(main); layout=QVBoxLayout(main)
-        title=QLabel('秸秆科研视频抽帧工具'); title.setStyleSheet('font-size:24px;font-weight:600'); layout.addWidget(title)
+        title=QLabel('秸秆抽帧工作台'); title.setStyleSheet('font-size:24px;font-weight:600'); layout.addWidget(title)
         intro=QLabel('原始尺寸 · 实际源帧 PTS · CSV 元数据 · 可复现实验'); layout.addWidget(intro)
         toolbar=QHBoxLayout(); self.add=QPushButton('导入视频…'); self.remove=QPushButton('移除选中'); self.clear=QPushButton('清空列表'); self.theme=QComboBox(); self.theme.addItems(['浅色','深色'])
         for w in (self.add,self.remove,self.clear): toolbar.addWidget(w)
@@ -36,7 +40,7 @@ class MainWindow(QMainWindow):
         warning=QLabel('缩放可能影响小目标 / 细秸秆分割，不建议作为原始科研数据的唯一保存版本。JPEG 有损；需要无损请选 PNG。'); warning.setWordWrap(True); grid.addWidget(warning,6,0,1,4)
         self.estimate=QLabel(); self.estimate.setStyleSheet('font-size:16px;font-weight:600;padding:6px'); layout.addWidget(self.estimate)
         actions=QHBoxLayout(); self.start=QPushButton('开始抽帧'); self.start.setMinimumHeight(36); self.cancel=QPushButton('取消'); self.cancel.setEnabled(False); self.open_output=QPushButton('打开结果目录'); self.open_output.setEnabled(False)
-        self.annotate=QPushButton('像素标注…'); self.annotate.setToolTip('打开人工像素标注工作台，导出材料掩码、有效地面范围及研究数据包')
+        self.annotate=QPushButton('打开标注工作台…'); self.annotate.setToolTip('启动独立的 StrawAnnotationStudio；未安装时可选择其 annotate.py 或可执行程序')
         for w in (self.start,self.cancel,self.open_output,self.annotate): actions.addWidget(w)
         layout.addLayout(actions)
         self.status=QLabel('就绪'); layout.addWidget(self.status); self.overall=QProgressBar(); self.fileprogress=QProgressBar(); self.overall.setFormat('总体进度 %p%'); self.fileprogress.setFormat('当前视频 %p%'); layout.addWidget(self.overall); layout.addWidget(self.fileprogress)
@@ -102,9 +106,15 @@ class MainWindow(QMainWindow):
         if not directory: return
         try:
             images=Path(directory)
-            server=launch_annotation(images, images.parent/'human_annotations')
-            if server is not None: self.annotation_servers.append(server)
-            self.log.appendPlainText('标注工作台：http://127.0.0.1:8765/\n导出位置：'+str(images.parent/'human_annotations'))
+            target=self.prefs.value('annotation_launcher','')
+            try:
+                launch_annotation(images, images.parent/'human_annotations', target)
+            except FileNotFoundError:
+                target,_=QFileDialog.getOpenFileName(self,'选择 StrawAnnotationStudio 的 annotate.py 或可执行程序','','标注启动程序 (annotate.py StrawAnnotationStudio.exe StrawAnnotationStudio);;所有文件 (*)')
+                if not target: return
+                launch_annotation(images, images.parent/'human_annotations', target)
+                self.prefs.setValue('annotation_launcher',target)
+            self.log.appendPlainText('已启动独立标注工作台；请保留标注服务窗口。\n导出位置：'+str(images.parent/'human_annotations'))
         except Exception as exc: self.error('标注工具启动失败：'+str(exc))
     def set_busy(self,busy):
         self.busy=busy
@@ -141,6 +151,4 @@ class MainWindow(QMainWindow):
             self.cancel_run(); self.status.setText('正在安全取消；任务停止后可关闭窗口'); event.ignore(); return
         if self.prober and self.prober.isRunning():
             self.prober.requestInterruption(); self.status.setText('正在读取当前文件；读取结束后可关闭窗口'); event.ignore(); return
-        for server in self.annotation_servers:
-            server.shutdown(); server.server_close()
         event.accept()

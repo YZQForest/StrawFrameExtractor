@@ -10,8 +10,8 @@
 4. 成功产物位于：
 
 ```text
-dist/StrawFrameExtractor/
-├── StrawFrameExtractor.exe
+dist/StrawFrameStudio/
+├── StrawFrameStudio.exe
 ├── _internal/                 # Python、Qt 和其依赖
 ├── ffmpeg/
 │   ├── ffmpeg.exe
@@ -21,11 +21,11 @@ dist/StrawFrameExtractor/
 └── BUILD.md
 ```
 
-请分发整个 `dist/StrawFrameExtractor` 文件夹，不能只复制 exe。用户启动打包版不需要安装 Python。
+请分发整个 `dist/StrawFrameStudio` 文件夹，不能只复制 exe。用户启动打包版不需要安装 Python。
 
 ## 配置
 
-- `StrawFrameExtractor.spec`：PyInstaller onedir 配置，关闭控制台窗口，排除不用的 QtWebEngine/QML 模块，不使用 UPX。
+- `StrawFrameStudio.spec`：PyInstaller onedir 配置，关闭控制台窗口，排除不用的 QtWebEngine/QML 模块，不使用 UPX。
 - `build.bat`：构建后将 ffmpeg 文件夹置于 exe 旁边。
 - 后端同时支持 `_MEIPASS/ffmpeg`，便于将来调整为内置资源模式。
 - `requirements.txt`：运行依赖；`requirements-dev.txt`：测试和构建依赖。

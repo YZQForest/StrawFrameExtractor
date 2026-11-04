@@ -1,4 +1,6 @@
-# 验证报告
+# StrawFrameStudio 验证报告
+
+以下为拆分前的历史抽帧验证记录；拆分后的验证另列于文末。
 
 日期：2026-10-03（Asia/Shanghai）。环境：macOS Apple Silicon、Python 3.14.6、PySide6 6.11.2、Pillow 12.3.0、pytest 9.1.1；FFmpeg / ffprobe 9.0.2（Martin Riedl 静态构建，仅作为本机测试依赖，未附入交付包）。
 
@@ -43,16 +45,10 @@ Windows 准备 ffmpeg/ffmpeg.exe 与 ffmpeg/ffprobe.exe 后：
 - 图片格式和方向已验证；未实际启动 AnyLabeling / SAM。
 - PyInstaller 配置已提供，未在本机执行跨系统打包；不能将源码测试成功当作 Windows exe 已验证。
 
+## 2026-11-04 独立仓库 v1.1.0
 
-## 2026-10-15 人工像素标注 v2
-
-- Python 标准库包校验与本机保存测试：9/9通过，包括覆盖率区间、训练映射、草稿隔离、完成门、SHA损坏、路径越界、独立导出不覆盖及本机令牌。
-- Chrome 实际浏览器端到端流程：11项通过，未产生 JavaScript pageerror。覆盖目录载入、画笔/矩形/多边形、撤销重做、材料争议与ROI分离、未标完成门、真正PNG导出独立解码、原图字节不变、服务端校验、刷新恢复、ZIP恢复与空白独立复标。
-- 测试只用合成图片，测试输出与科研人工标签分开。标注者声明完成不等于人工正确性认证。
-- Mac副本与仓库HTML/服务/校验模块逐文件SHA一致；Python语法与git diff空白检查通过。
-- Windows GUI增加标注入口，PyInstaller包含HTML；本次未在Windows运行或生成exe。原抽帧功能没有改动。
-
-
-## 2026-10-15 简洁界面 v2.1
-
-主界面收为两栏，身份只填一次，完成检查一次勾选；复标、恢复、备注、统计和设置在更多。数据编码和研究包格式保留，完成记录分别保存三项检查声明及combined_checklist来源。9项Python测试、12项Chrome端到端检查通过，包括v2.0数据包兼容与既有三项检查恢复。实图768裁块预览没有页面脚本异常；测试输出均为隔离合成数据。
+- Python 3.12.16、Pillow 12.3.0、pytest 9.1.1、FFmpeg/ffprobe 9.0.2。
+- 抽帧核心及跨仓库桥接测试：20/20 通过。覆盖源帧 PTS、中文路径、JPG/PNG、取消/续跑、缩放、VFR、显示旋转，以及独立标注启动参数。
+- 实际子进程衔接检查通过：自动发现同级 StrawAnnotationStudio，并验证网页、目录清单与指定输出位置。
+- Python 语法和 git diff --check 通过。
+- 本轮未重跑 Qt GUI 完整交互、Windows 构建或 Windows 真机验收；上方 GUI 测试结果属于历史证据。

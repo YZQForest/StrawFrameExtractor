@@ -11,13 +11,13 @@ if not exist .venv\Scripts\python.exe (
 if errorlevel 1 goto fail
 .venv\Scripts\python.exe -m pytest -q
 if errorlevel 1 goto fail
-.venv\Scripts\python.exe -m PyInstaller --noconfirm --clean StrawFrameExtractor.spec
+.venv\Scripts\python.exe -m PyInstaller --noconfirm --clean StrawFrameStudio.spec
 if errorlevel 1 goto fail
-xcopy /e /i /y ffmpeg dist\StrawFrameExtractor\ffmpeg
+xcopy /e /i /y ffmpeg dist\StrawFrameStudio\ffmpeg
 if errorlevel 1 goto fail
-copy README.md dist\StrawFrameExtractor\README.md >nul
-copy BUILD.md dist\StrawFrameExtractor\BUILD.md >nul
-echo Ready: dist\StrawFrameExtractor\StrawFrameExtractor.exe
+copy README.md dist\StrawFrameStudio\README.md >nul
+copy BUILD.md dist\StrawFrameStudio\BUILD.md >nul
+echo Ready: dist\StrawFrameStudio\StrawFrameStudio.exe
 pause
 exit /b 0
 :missing

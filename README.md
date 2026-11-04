@@ -1,20 +1,24 @@
-# StrawFrameExtractor — 秸秆科研视频抽帧工具
+# StrawFrameStudio · 秸秆抽帧工作台
 
 用于农田视频数据集预处理：流式抽取 JPG/PNG，保留实际源帧 PTS、原始编码尺寸、输出尺寸、视频参数、日志和抽帧配置。默认 2 fps、高质量 JPEG、原始尺寸、新任务目录。GUI 简体中文，支持多视频、拖拽、深浅主题、取消、进度和输出估算。
 
-## 人工像素标注（Windows / Mac / 独立浏览器）
+## 独立仓库与标注衔接
 
-新增简洁离线像素标注工作台：批量图片、原尺度画笔/多边形/矩形、缩放平移、撤销重做、自动保存、空白独立复标、跨电脑恢复，以及一键导出原图、材料掩码、有效地面 ROI、训练掩码、覆盖率区间和来源 SHA-256。完成项与草稿隔离。本机入口自动校验并保存完整数据包。
+本仓库由 StrawFrameExtractor 改名为 **StrawFrameStudio**，保留原 Git 历史，当前版本 **1.1.0**。抽帧功能、时间戳与输出格式保持兼容。
 
-抽帧 GUI 点「像素标注…」，选择输出任务中的 images；Windows 独立运行 `annotate.bat`，Mac 双击 `打开标注工具.command`。独立标注无需安装 PySide6 / FFmpeg，仅 Python 3.12+；也可直接打开 `src/strawframe/annotation/web/index.html`。完整操作和科研格式见 [标注说明](docs/ANNOTATION.md)。
+人工标注已迁移到 [StrawAnnotationStudio](https://github.com/YZQForest/StrawAnnotationStudio)，包含独立源码、网页、测试和构建说明。抽帧本身无需安装标注仓库。
+
+需要标注时，点击「打开标注工作台…」并选择图片目录。将两个源码仓库放在同一父目录可自动发现标注入口；否则按提示选择标注仓库的 `annotate.py` 或独立可执行程序。标注服务作为独立进程运行，关闭抽帧窗口不会关闭它。源码方式需要 Python；独立标注 exe 无需 Python。
+
+也可以单独运行 `python3 annotate.py --images "/path/to/run/images" --output "/path/to/annotations"`（在标注仓库中执行）。请保留抽帧任务的 `metadata` 目录以传递帧来源。
 
 ## 快速开始（Windows）
 
 1. 解压整个项目到普通文件夹，支持中文和空格路径。
-2. 安装 **64 位 Python 3.12–3.14**，包含 Python Launcher（`py`）和 pip。开发环境已使用 Python 3.14.6；Windows 运行与打包需要在 Windows 上进行。
+2. 安装 **64 位 Python 3.12–3.14**，包含 Python Launcher（`py`）和 pip。历史验证使用 Python 3.14.6；Windows 运行与打包需要在 Windows 上进行。
 3. 从 [FFmpeg 官方下载入口](https://ffmpeg.org/download.html) 的 Windows builds 下载 FFmpeg 6 或更新版本。将同一版本的 `ffmpeg.exe`、`ffprobe.exe` 放入项目的 `ffmpeg/`；同时保留该构建附带的许可证说明。
 4. 双击 **`run.bat`**。首次运行自动创建 `.venv` 并安装依赖，需要联网。以后直接启动 GUI。
-5. 导入视频，选择输出位置，点击「始抽帧」。一般保持默认参数即可。
+5. 导入视频，选择输出位置，点击「开始抽帧」。一般保持默认参数即可。
 
 若已有系统 FFmpeg，可直接使用 PATH；也可在 GUI 手动选择同时包含两个工具的目录。查找顺序：手动路径（指定后必须有效）→ exe 旁 `ffmpeg/` → PyInstaller `_MEIPASS/ffmpeg` → 源码项目 `ffmpeg/` → 当前目录 `ffmpeg/` → PATH。启动抽帧前会重新检查工具。
 
@@ -135,3 +139,7 @@ FFmpeg 默认自动根据显示旋转矩阵旋转像素，输出没有依赖 EXI
 测试脚本在 `tests/`，可用 `.venv\Scripts\python.exe -m pytest -q` 执行。详见 [TEST_REPORT.md](TEST_REPORT.md)。
 
 Future Work：相似帧去重、模糊检测、CLIP/DINO 聚类、按拍摄批次划分数据集、统计报告、SAM 集成。第一版以实际源帧与可复现抽帧为主。
+
+## 拆分与历史兼容
+
+详见 [CHANGELOG.md](CHANGELOG.md)。历史示例中的旧应用名、版本及绝对路径是当时的生成记录，保持原样；新输出使用当前版本。旧偏好设置会迁入新应用名，原输出目录与数据格式不变。
