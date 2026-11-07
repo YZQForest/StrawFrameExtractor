@@ -5,6 +5,7 @@
 - 跳过模式续跑时，自动清理上次被强制结束后残留的 `.staging_*` 临时目录（其中内容从未写入 images 或 CSV），并写入日志；新增对应测试。
 - 用 ruff format 统一代码排版（行宽 100，配置见 `ruff.toml`），语法树与排版前完全一致；去掉 5 个未使用的 import。
 - 示例输出中的开发机器绝对路径改为相对仓库根目录的路径。
+- 修复 Windows 上偶发的抽帧失败：FFmpeg 刚写完的图片短暂被占用时（PermissionError），等下一行日志再读，FFmpeg 退出后仍失败才报错。由新加的 Windows CI 发现。
 - 新增 GitHub Actions：Windows 上 Python 3.12 / 3.14 安装 FFmpeg 后运行全部测试，并检查代码格式。
 
 ## 1.1.0 · 2026-11-04

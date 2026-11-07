@@ -233,8 +233,15 @@ class Extractor:
                         if not temp.exists():
                             break
                         # image2 atomic_writing renames only after a complete image is written.
-                        with Image.open(temp) as im:
-                            im.load()
+                        try:
+                            with Image.open(temp) as im:
+                                im.load()
+                        except PermissionError:
+                            # Windows: FFmpeg may still hold the just-renamed file for a moment.
+                            # Retry on the next log line; after FFmpeg exits the file is released.
+                            if proc.poll() is None:
+                                break
+                            raise
                         stamp = (pts - origin) * timebase
                         name = f"{vid}_t{millis(stamp):012d}_f{n + 1:09d}.{settings.image_format}"
                         dest = root / "images" / name
