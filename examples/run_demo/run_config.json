@@ -13,14 +13,14 @@
   },
   "extract_fps": "2",
   "keep_original_resolution": true,
-  "ffmpeg_path": "/Users/yzq/Documents/Codex/2026-10-03/files-mentioned-by-the-user-1/work/ffmpeg/ffmpeg",
-  "ffprobe_path": "/Users/yzq/Documents/Codex/2026-10-03/files-mentioned-by-the-user-1/work/ffmpeg/ffprobe",
+  "ffmpeg_path": "ffmpeg/ffmpeg",
+  "ffprobe_path": "ffmpeg/ffprobe",
   "ffmpeg_version": "ffmpeg version 9.0.2-https://www.martin-riedl.de Copyright (c) 2000-2026 the FFmpeg developers",
   "inputs": [
     {
       "video_id": "V01_ef69ad1f3273",
       "video": {
-        "path": "/Users/yzq/Documents/Codex/2026-10-03/files-mentioned-by-the-user-1/outputs/StrawFrameExtractor/examples/inputs/中文 样例.mp4",
+        "path": "examples/inputs/中文 样例.mp4",
         "duration": 2.002,
         "width": 640,
         "height": 360,
